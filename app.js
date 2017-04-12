@@ -19,6 +19,9 @@ console.log("Server started");
 var SOCKET_LIST = {};
 
 var io = require('socket.io')(serv,{});
+
+//On connection of a client to the socket, append an id and positoin ot the socket, and
+//store in the SOCKET_LIST
 io.sockets.on('connection', function(socket){
   socket.id = Math.random();
   socket.x = 0;
@@ -30,13 +33,21 @@ io.sockets.on('connection', function(socket){
 
 //Called 25 times a second
 setInterval(function(){
-  for(var i in SOCKET_LIST){ //Loop through all sockets, update position, emit position to that client
+  var pack = []; //Information about all players in the game
+
+  for(var i in SOCKET_LIST){ //Loop through all sockets, add positional to a packet
     var socket = SOCKET_LIST[i];
     socket.x++;
     socket.y++;
-    socket.emit('newPosition', {
+    pack.push({
       x:socket.x,
       y:socket.y
-    });
+    })
+  }
+
+  //Loop through all sockets, send position packet
+  for(var i in SOCKET_LIST){
+    var socket = SOCKET_LIST[i];
+    socket.emit('newPositions', pack);
   }
 }, 1000/25);
