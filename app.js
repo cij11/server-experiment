@@ -26,9 +26,16 @@ io.sockets.on('connection', function(socket){
   socket.id = Math.random();
   socket.x = 0;
   socket.y = 0;
+  socket.number = "" + Math.floor(10* Math.random());
   SOCKET_LIST[socket.id] = socket; //Store new socket in the socket list
 
   console.log('socket connection');
+  var keys = Object.keys(SOCKET_LIST);
+  console.log('Number of connections = ' + keys.length);
+
+  socket.on('disconnect', function(){
+    delete SOCKET_LIST[socket.id];
+  })
 });
 
 //Called 25 times a second
@@ -41,7 +48,8 @@ setInterval(function(){
     socket.y++;
     pack.push({
       x:socket.x,
-      y:socket.y
+      y:socket.y,
+      number:socket.number
     })
   }
 
